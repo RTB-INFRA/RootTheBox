@@ -1,0 +1,19 @@
+# Dockerfile.production
+FROM python:3.10-slim
+
+WORKDIR /opt/rtb
+COPY . /opt/rtb
+
+# Install system deps
+RUN apt-get update && apt-get install -y build-essential libpq-dev \
+ && pip install --no-cache-dir -r setup/requirements.txt \
+ && rm -rf /var/lib/apt/lists/*
+
+# Env vars will point to Postgres + Redis (set in Azure App Service)
+ENV FLASK_ENV=production
+ENV SQL_DIALECT=postgres
+
+EXPOSE 8080
+
+# Run RTB normally
+CMD ["python3", "rootthebox.py"]
